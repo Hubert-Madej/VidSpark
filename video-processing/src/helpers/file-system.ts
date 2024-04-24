@@ -6,7 +6,7 @@ import fs from 'fs';
  */
 export function ensureDirectoryExists(directoryPath: string) {
   // Directory not exists, create one.
-  if (!fs.existsSync) {
+  if (!fs.existsSync(directoryPath)) {
     fs.mkdirSync(directoryPath, { recursive: true });
     console.log(`Directory ${directoryPath} created.`);
   }

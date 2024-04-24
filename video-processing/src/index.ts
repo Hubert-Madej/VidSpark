@@ -1,12 +1,11 @@
 import express from "express";
 import { cleanupLocalFiles, downloadRawVideo, processVideo, setupDirectories, uploadProcessedVideo } from "./helpers/storage";
 
-setupDirectories();
+require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-
-const port = process.env.PORT || 3000;
+setupDirectories();
 
 app.post("/process", async (req, res) => {
   let data;
@@ -46,6 +45,7 @@ app.post("/process", async (req, res) => {
   return res.status(200).send(`Video processed successfully.`);
 });
 
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`🚀 Video Processing Service is listening at port :${port}`)
 })

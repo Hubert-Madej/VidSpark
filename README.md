@@ -27,7 +27,7 @@ The scale of these features on YouTube is enormous; even basic actions like liki
 Cloud storage is simple, scalable and cost effective solution designed for sotring and serving large files. It will be used for storing raw and processed videos.
 
 ### Cloud Pub / Sub
-When a video is uploaded, a message will be published to a Cloud Pub/Sub topic. This approach enables asynchronous video processing and adds a durability layer, ensuring that upload requests are only removed from the Pub/Sub system after they've been successfully processed.
+When a video is uploaded, a message will be published to a Cloud Pub/Sub topic. This approach enables asynchronous video processing and adds a durability layer, ensuring that upload requests are only removed from the Pub/Sub system after they've been successfully processed. We also introduce event-driven approach, as we don't need to poll videos bucket to see if a new video has been uploaded, instead the message will be pushed to Cloud Run service.
 
 ### Cloud Run - Video Processing Workers
 To reduce the load on the primary server, which focuses on handling user requests, a dedicated Cloud Run instance will be used for asynchronous processing of uploaded videos. Upon receiving a message from Pub/Sub, a video processing worker will transcode the uploaded video

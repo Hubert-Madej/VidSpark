@@ -34,7 +34,7 @@ export function processVideo(rawVideoName: string, processedVideoName: string) {
         resolve();
       })
       .on('error', (err) => {
-        console.log(`An error occured during video processing: ${err.message}`);
+        console.error(`An error occured during video processing: ${err.message}`);
         reject(err);
       })
       .save(`${localProcessedVideoPath}/${processedVideoName}`);
