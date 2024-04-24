@@ -88,6 +88,12 @@ export function deleteLocalRawVideo(rawVideoName: string) {
   return deleteFile(`${localRawVideoPath}/${rawVideoName}`);
 }
 
+/**
+ * Perform cleanup of raw and processed video files.
+ * @param inputFileName - The name of the raw video file to delete from the {@link localRawVideoPath} folder.
+ * @param outputFileName - The name of the processed video file to delete from the {@link localProcessedVideoPath} folder.
+ * @returns A promise that resolves when the files have been deleted.
+ */
 export function cleanupLocalFiles(inputFileName: string, outputFileName: string) {
   return Promise.all([
     deleteLocalRawVideo(inputFileName),
