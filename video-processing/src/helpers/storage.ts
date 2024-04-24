@@ -69,9 +69,6 @@ export async function uploadProcessedVideo(processedVideoName: string) {
 
   // Required to allow all users of the platform to view the video
   await bucket.file(processedVideoName).makePublic();
-
-  // Clean up the local processed video file
-
 }
 
 /**
