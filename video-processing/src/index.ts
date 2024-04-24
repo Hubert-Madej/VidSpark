@@ -1,32 +1,49 @@
 import express from "express";
-import Ffmpeg from "fluent-ffmpeg";
+import { cleanupLocalFiles, downloadRawVideo, processVideo, setupDirectories, uploadProcessedVideo } from "./helpers/storage";
+
+setupDirectories();
 
 const app = express();
 app.use(express.json());
 
 const port = process.env.PORT || 3000;
 
-app.post("/process", (req, res) => {
-  const inputFilePath = req.body.inputFilePath as string;
-  const outputFilePath = req.body.outputFilePath as string;
-  
-  if (!inputFilePath || !outputFilePath) {
-    res.status(400).send(`Missing required parameters: inputFilePath and outputFilePath.`);
-    return;
+app.post("/process", async (req, res) => {
+  let data;
+  try {
+    const message = Buffer.from(req.body.message.data, 'base64').toString('utf-8');
+    data = JSON.parse(message);
+    if (!data.name) {
+      throw new Error('Invalid Payload received.');
+    }
+  } catch (err) {
+    console.error(`Error parsing Pub/Sub message: ${err}`);
+    return res.status(400).send(`Bad Request: missing name parameter.`);
   }
 
-  // Convert video to 360p
-  Ffmpeg()
-  .input(inputFilePath)
-    .outputOption('-vf', 'scale=-1:360')
-    .on('end', () => {
-      res.status(200).send(`Video processing finished successfully.`);
-    })
-    .on('error', (err) => {
-      console.log(`An error occured during video processing: ${err.message}`);
-      res.status(500).send(`Failed to process video: ${err.error}`);
-    })
-    .save(outputFilePath);
+  const inputFileName = data.name;
+  const outputFileName = `processed-${data.name}`;
+
+  // Download the raw video from GCS.
+  await downloadRawVideo(inputFileName);
+
+  try {
+    await processVideo(inputFileName, outputFileName);
+  } catch (err) {
+    console.error(`Error processing video: ${err}`);
+    // Clean up local files in case of processing failure. Promise.all allowed as it doesn't matter which file is deleted first.
+    await cleanupLocalFiles(inputFileName, outputFileName);
+
+    return res.status(500).send(`Internal Server Error: video processing failed.`);
+  }
+
+  // Upload the processed video to GCS.
+  await uploadProcessedVideo(outputFileName);
+
+  // Perfom cleanup after uploading the processed video.
+  await cleanupLocalFiles(inputFileName, outputFileName);
+
+  return res.status(200).send(`Video processed successfully.`);
 });
 
 app.listen(port, () => {
