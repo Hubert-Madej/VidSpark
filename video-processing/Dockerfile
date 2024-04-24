@@ -1,5 +1,5 @@
 # Stage 1: Build the app
-FROM node:20.04 AS builder
+FROM node:20 AS builder
 
 # Set the working directory
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production environment
-FROM node:20.04
+FROM node:20
 
 # Install ffmpeg
 RUN apt-get update && apt-get install -y ffmpeg

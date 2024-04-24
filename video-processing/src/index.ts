@@ -24,7 +24,7 @@ app.post("/process", (req, res) => {
     })
     .on('error', (err) => {
       console.log(`An error occured during video processing: ${err.message}`);
-      res.status(500).send(`Failed to process video.`);
+      res.status(500).send(`Failed to process video: ${err.error}`);
     })
     .save(outputFilePath);
 });
