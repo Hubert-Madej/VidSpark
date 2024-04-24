@@ -1,4 +1,4 @@
-# Youtube Skeleton Design
+# VidSpark - Youtube like platform Skeleton Design
 
 ## Introduction
 This document designs a simple `YouTube` clone.
