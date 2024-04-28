@@ -1,7 +1,14 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User } from "firebase/auth";
-import { firebaseConfig } from "../config/firebase.config";
+import { initializeApp } from 'firebase/app';
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  User,
+} from 'firebase/auth';
+
+import { firebaseConfig } from '../config/firebase.config';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -28,6 +35,8 @@ export const signOut = async () => {
  * A helper function that listens for auth state changes and triggers a callback when it changes.
  * @param callback The callback function to call when the auth state changes.
  */
-export const onAuthStateChangedHelper = (callback: (user: User | null) => void) => {
+export const onAuthStateChangedHelper = (
+  callback: (user: User | null) => void,
+) => {
   return onAuthStateChanged(auth, callback);
 };

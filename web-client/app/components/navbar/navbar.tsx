@@ -1,12 +1,13 @@
 'use client';
 
-import Link from "next/link";
-import styles from "./navbar.module.css";
-import { Flex } from "@radix-ui/themes";
-import { onAuthStateChangedHelper } from "@/app/utilities/firebase/firebase";
-import { useEffect, useState } from "react";
-import { User } from "firebase/auth";
-import Auth from "../auth/auth";
+import { onAuthStateChangedHelper } from '@/app/utilities/firebase/firebase';
+import { Flex } from '@radix-ui/themes';
+import { User } from 'firebase/auth';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+import styles from './navbar.module.css';
+import Auth from '../auth/auth';
 
 export default function Navbar() {
   // Initialize the user state.
@@ -21,7 +22,7 @@ export default function Navbar() {
 
   return (
     <nav className={styles.nav}>
-      <Flex gap='4' justify='between' align='center' width='100%'>
+      <Flex gap="4" justify="between" align="center" width="100%">
         <Link href="/">
           <span className={styles.header}>
             <span className={styles['header-pre']}>Vid</span>Spark
