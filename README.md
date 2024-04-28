@@ -41,7 +41,7 @@ After a video is processed, all its metadata will be stored in Firestore. This e
 To get started Videos API will allow users to upload and retreive videos metadata (Can be easily extended in the future by adding more CRUD operations).
 
 ### Cloud Run - Web Application
-For building web application an Angular will be used.
+For building web application an Nextjs v14 will be used.
 
 ### Firebase Auth - Authentication
 This will allow for easy integration with Google Sign In.
