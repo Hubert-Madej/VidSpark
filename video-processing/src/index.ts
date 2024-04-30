@@ -6,12 +6,18 @@ import {
   uploadProcessedVideo,
 } from "./helpers/storage";
 import dotenv from "dotenv";
+import {isVideoNew, setVideo} from "./helpers/firestore";
+import {VideoProcessingStatus} from "./enums/video-processing-status.enum";
+
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 setupDirectories();
 
+// @TODO: Refactor the code to split responsibilities into separate functions.
+// @TODO: Verify edge-cases, check for possible errors.
+// (Failed calls to db, what will happen in Pub/Sub)
 app.post("/process", async (req, res) => {
   let data;
   try {
@@ -29,6 +35,18 @@ app.post("/process", async (req, res) => {
 
   const inputFileName = data.name;
   const outputFileName = `processed-${data.name}`;
+  const videoId = inputFileName.split(".")[0];
+
+  if (!(await isVideoNew(videoId))) {
+    console.log(`Video ${videoId} processing already started.`);
+    return res.status(400).send("Video processing already started.");
+  } else {
+    await setVideo(videoId, {
+      id: videoId,
+      uid: videoId.split("-")[0],
+      status: VideoProcessingStatus.PROCESSING,
+    });
+  }
 
   // Download the raw video from GCS.
   await downloadRawVideo(inputFileName);
@@ -48,6 +66,11 @@ app.post("/process", async (req, res) => {
 
   // Upload the processed video to GCS.
   await uploadProcessedVideo(outputFileName);
+
+  await setVideo(videoId, {
+    status: VideoProcessingStatus.COMPLETED,
+    filename: outputFileName,
+  });
 
   // Perfom cleanup after uploading the processed video.
   await cleanupLocalFiles(inputFileName, outputFileName);

@@ -1,14 +1,16 @@
 import {Storage} from "@google-cloud/storage";
 import ffmpeg from "fluent-ffmpeg";
 import {deleteFile, ensureDirectoryExists} from "./file-system";
+import {
+  processedVideoBucketName,
+  rawVideoBucketName,
+} from "../constants/buckets.constant";
+import {
+  localProcessedVideoPath,
+  localRawVideoPath,
+} from "../constants/local-paths.constants";
 
 const storage = new Storage();
-
-const rawVideoBucketName = "vidspark-raw-videos";
-const processedVideoBucketName = "vidspark-processed-videos";
-
-const localRawVideoPath = "./raw-videos";
-const localProcessedVideoPath = "./processed-videos";
 
 /**
  * Set up the directories for storing raw and processed videos.
