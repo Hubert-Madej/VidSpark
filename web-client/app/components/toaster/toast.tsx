@@ -10,6 +10,7 @@ interface ToasterProps {
   duration?: number;
 }
 
+// @TODO: Add different toast types, depending on function call outcome (success, error, warning, etc.).
 const Toaster: React.FC<ToasterProps> = ({ open, setOpen, children, text, duration = 5000 }) => {
   React.useEffect(() => {
     let timer: NodeJS.Timeout;

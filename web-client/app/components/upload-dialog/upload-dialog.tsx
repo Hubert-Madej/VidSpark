@@ -1,6 +1,6 @@
 import { AuthProps } from '@/app/interfaces/auth-user.interface';
 import { uploadVideo } from '@/app/utilities/firebase/functions';
-import Toaster from '@/app/utilities/toaster/toast';
+import Toaster from '@/app/components/toaster/toast';
 import { Button, Dialog, Flex, Text } from '@radix-ui/themes';
 import * as React from 'react';
 import { FaUpload } from 'react-icons/fa';
