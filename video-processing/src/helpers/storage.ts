@@ -1,40 +1,44 @@
-import { Storage } from '@google-cloud/storage';
-import Ffmpeg from 'fluent-ffmpeg';
-import { deleteFile, ensureDirectoryExists } from './file-system';
+import {Storage} from "@google-cloud/storage";
+import ffmpeg from "fluent-ffmpeg";
+import {deleteFile, ensureDirectoryExists} from "./file-system";
 
 const storage = new Storage();
 
-const rawVideoBucketName = 'vidspark-raw-videos';
-const processedVideoBucketName = 'vidspark-processed-videos';
+const rawVideoBucketName = "vidspark-raw-videos";
+const processedVideoBucketName = "vidspark-processed-videos";
 
-const localRawVideoPath = './raw-videos';
-const localProcessedVideoPath = './processed-videos';
+const localRawVideoPath = "./raw-videos";
+const localProcessedVideoPath = "./processed-videos";
 
 /**
  * Set up the directories for storing raw and processed videos.
  */
-export function setupDirectories() { 
+export function setupDirectories() {
   ensureDirectoryExists(localRawVideoPath);
   ensureDirectoryExists(localProcessedVideoPath);
 }
 
 /**
- * 
- * @param rawVideoName - The name of the file to convert from {@link localRawVideoPath}.
- * @param processedVideoName  - The name of the file to convert to {@link localProcessedVideoPath}.
- * @returns A promise that resolves when the video is processed.
+ * @param {string} rawVideoName
+ * The name of the file to convert from {@link localRawVideoPath}.
+ * @param {string} processedVideoName
+ * The name of the file to convert to {@link localProcessedVideoPath}.
+ * @return {Promise<void>}
+ * A promise that resolves when the video is processed.
  */
 export function processVideo(rawVideoName: string, processedVideoName: string) {
   return new Promise<void>((resolve, reject) => {
-    Ffmpeg()
+    ffmpeg()
       .input(`${localRawVideoPath}/${rawVideoName}`)
-      .outputOption('-vf', 'scale=-1:360')
-      .on('end', () => {
-        console.log('Processing finished successfully');
+      .outputOption("-vf", "scale=-1:360")
+      .on("end", () => {
+        console.log("Processing finished successfully");
         resolve();
       })
-      .on('error', (err) => {
-        console.error(`An error occured during video processing: ${err.message}`);
+      .on("error", (err) => {
+        console.error(`
+        An error occured during video processing: ${err.message}`
+        );
         reject(err);
       })
       .save(`${localProcessedVideoPath}/${processedVideoName}`);
@@ -42,22 +46,31 @@ export function processVideo(rawVideoName: string, processedVideoName: string) {
 }
 
 /**
- * @param rawVideoName - The name of the raw video file to download.
- * {@link rawVideoBucketName} bucket into the {@link localRawVideoPath} folder.
- * @returns A promise that resolves when the video is downloaded.
+ * @param {string} rawVideoName
+ * The name of the raw video file to download.
+ * {@link rawVideoBucketName}
+ * bucket into the {@link localRawVideoPath} folder.
+ * @return {Promise<void>}
+ * A promise that resolves when the video is downloaded.
  */
 export async function downloadRawVideo(rawVideoName: string) {
-  const downloadedRawVideoFile = await storage.bucket(rawVideoBucketName)
+  await storage.bucket(rawVideoBucketName)
     .file(rawVideoName)
-    .download({ destination: `${localRawVideoPath}/${rawVideoName}` });
+    .download({destination: `${localRawVideoPath}/${rawVideoName}`});
 
-  console.log(`gs://${rawVideoBucketName}/${rawVideoName} downloaded to ${localRawVideoPath}/${rawVideoName}`);
+  console.log(
+    `gs://${rawVideoBucketName}/${rawVideoName} 
+    downloaded to ${localRawVideoPath}/${rawVideoName}`
+  );
 }
 
 /**
- * @param processedVideoName - The name of the processed video file to upload.
- * {@link localProcessedVideoPath} folder from the {@link processedVideoBucketName} bucket.
- * @returns A promise that resolves when the video is uploaded.
+ * @param {string} processedVideoName
+ * The name of the processed video file to upload.
+ * {@link localProcessedVideoPath} folder
+ * from the {@link processedVideoBucketName} bucket.
+ * @return {Promise<void>}
+ * A promise that resolves when the video is uploaded.
  */
 export async function uploadProcessedVideo(processedVideoName: string) {
   const bucket = storage.bucket(processedVideoBucketName);
@@ -65,24 +78,32 @@ export async function uploadProcessedVideo(processedVideoName: string) {
     destination: processedVideoName,
   });
 
-  console.log(`File ${processedVideoName} uploaded to gs://${processedVideoBucketName}/${processedVideoName}`)
+  console.log(
+    `File ${processedVideoName} uploaded to 
+    gs://${processedVideoBucketName}/${processedVideoName}`
+  );
 
   // Required to allow all users of the platform to view the video
   await bucket.file(processedVideoName).makePublic();
 }
 
 /**
- * @param processedVideoName - The name of processed video file to delete from the {@link processedVideoBucketName} folder.
- * {@link localProcessedVideoPath} folder.
- * @returns A promise that resolves when the file has been deleted.
+ * @param {string} processedVideoName
+ * The name of processed video file to delete
+ * from the {@link processedVideoBucketName} folder.
+ * @return {Promise<void>}
+ * A promise that resolves when the file has been deleted.
  */
 export function deleteLocalProcessedVideo(processedVideoName: string) {
   return deleteFile(`${localProcessedVideoPath}/${processedVideoName}`);
 }
 
 /**
- * @param rawVideoName  - The name of the raw video file to delete from the {@link localRawVideoPath} folder.
- * @returns A promise that resolves wheb the file has been deleted.
+ * @param {string} rawVideoName
+ * The name of the raw video file to delete
+ * from the {@link localRawVideoPath} folder.
+ * @return {Promise<void>}
+ * A promise that resolves wheb the file has been deleted.
  */
 export function deleteLocalRawVideo(rawVideoName: string) {
   return deleteFile(`${localRawVideoPath}/${rawVideoName}`);
@@ -90,11 +111,19 @@ export function deleteLocalRawVideo(rawVideoName: string) {
 
 /**
  * Perform cleanup of raw and processed video files.
- * @param inputFileName - The name of the raw video file to delete from the {@link localRawVideoPath} folder.
- * @param outputFileName - The name of the processed video file to delete from the {@link localProcessedVideoPath} folder.
- * @returns A promise that resolves when the files have been deleted.
+ * @param {string} inputFileName
+ * The name of the raw video file to delete
+ * from the {@link localRawVideoPath} folder.
+ * @param {string} outputFileName
+ * The name of the processed video file to delete
+ * from the {@link localProcessedVideoPath} folder.
+ * @return {Promise<void>}
+ * A promise that resolves when the files have been deleted.
  */
-export function cleanupLocalFiles(inputFileName: string, outputFileName: string) {
+export function cleanupLocalFiles(
+  inputFileName: string,
+  outputFileName: string
+) {
   return Promise.all([
     deleteLocalRawVideo(inputFileName),
     deleteLocalProcessedVideo(outputFileName),
