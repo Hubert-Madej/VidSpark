@@ -10,6 +10,7 @@ const fireStore = new Firestore();
 const storage = new Storage();
 
 const rawVideoBucketName = "vidspark-raw-videos";
+const videoCollectionId = "videos";
 
 /**
  * Function to create a new user in firestore.
@@ -27,6 +28,9 @@ export const createUser = functions.auth.user().onCreate((user) => {
   return;
 });
 
+/**
+ * Function to generate a signed URL for uploading a video.
+ */
 export const generateUploadUrl = onCall({maxInstances: 1}, async (request) => {
   // Check if user is authenticated
   if (!request.auth) {
@@ -47,4 +51,15 @@ export const generateUploadUrl = onCall({maxInstances: 1}, async (request) => {
   });
 
   return {url, fileName};
+});
+
+// @TODO: Add pagination functionality.
+/**
+ * Function to retreive all videos from firestore.
+ */
+export const getVideos = onCall({maxInstances: 1}, async () => {
+  const snapshot = await fireStore.collection(videoCollectionId).get();
+  const videos = snapshot.docs.map((doc) => doc.data());
+
+  return videos;
 });
