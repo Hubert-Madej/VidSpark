@@ -2,14 +2,12 @@
 
 import { signInWithGoogle, signOut } from '@/app/utilities/firebase/firebase';
 import { Button } from '@radix-ui/themes';
-import { User } from 'firebase/auth';
 import { FaGoogle, FaSignOutAlt } from 'react-icons/fa';
 
 import styles from './auth.module.css';
+import { AuthProps } from '@/app/interfaces/auth-user.interface';
 
-interface AuthProps {
-  user: User | null;
-}
+
 
 export default function Auth({ user }: AuthProps) {
   return (

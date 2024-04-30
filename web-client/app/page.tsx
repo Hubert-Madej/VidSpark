@@ -5,8 +5,7 @@ export default function Home() {
     <main className={styles.main}>
       <div className={styles.description}>
         <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
+         Here will be a home screen with all the videos.
         </p>
       </div>
     </main>
