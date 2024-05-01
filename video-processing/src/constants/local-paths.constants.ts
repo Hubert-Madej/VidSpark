@@ -8,3 +8,8 @@ export const localRawVideoPath = "./raw-videos";
  * source for uploading to GCS.
  */
 export const localProcessedVideoPath = "./processed-videos";
+
+/**
+ * Local path for storing video thumbnails.
+ */
+export const localThumbnailPath = "./thumbnails";

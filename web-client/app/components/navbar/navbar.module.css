@@ -33,3 +33,7 @@
 .header-pre:hover {
   background-color: #b9fff9;
 }
+
+.avatar {
+  border-radius: 50%;
+}

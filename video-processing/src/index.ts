@@ -1,13 +1,21 @@
 import express from "express";
+import dotenv from "dotenv";
+import {StatusCodes} from "http-status-codes";
 import {
   cleanupLocalFiles,
   downloadRawVideo,
-  processVideo, setupDirectories,
+  formatLocalProcessedVideoPath,
+  setupDirectories,
   uploadProcessedVideo,
-} from "./helpers/storage";
-import dotenv from "dotenv";
-import {isVideoNew, setVideo} from "./helpers/firestore";
-import {VideoProcessingStatus} from "./enums/video-processing-status.enum";
+} from "@helpers/storage";
+import {isVideoNew, setVideo} from "@helpers/firestore";
+import {VideoProcessingStatus} from "@enums/video-processing-status.enum";
+import {
+  generateThumbnailForVideo,
+  processVideo,
+} from "@helpers/video-processing";
+import {validateBody} from "@middlewares/validate-body.middleware";
+import {VideoMetadata} from "@dto/video-metadata.dto";
 
 dotenv.config();
 
@@ -18,19 +26,15 @@ setupDirectories();
 // @TODO: Refactor the code to split responsibilities into separate functions.
 // @TODO: Verify edge-cases, check for possible errors.
 // (Failed calls to db, what will happen in Pub/Sub)
-app.post("/process", async (req, res) => {
-  let data;
+app.post("/process", validateBody(VideoMetadata), async (req, res) => {
+  let data: VideoMetadata;
   try {
-    const message = Buffer
-      .from(req.body.message.data, "base64")
-      .toString("utf-8");
-    data = JSON.parse(message);
-    if (!data.name) {
-      throw new Error("Invalid Payload received.");
-    }
+    data = getRequestPayload(req);
   } catch (err) {
     console.error(`Error parsing Pub/Sub message: ${err}`);
-    return res.status(400).send("Bad Request: missing name parameter.");
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .send("Bad Request: missing name parameter.");
   }
 
   const inputFileName = data.name;
@@ -48,24 +52,22 @@ app.post("/process", async (req, res) => {
     });
   }
 
-  // Download the raw video from GCS.
-  await downloadRawVideo(inputFileName);
-
   try {
-    await processVideo(inputFileName, outputFileName);
-  } catch (err) {
-    console.error(`Error processing video: ${err}`);
-    /* Clean up local files in case of processing failure.
-    Promise.all allowed as it doesn't matter which file is deleted first. */
-    await cleanupLocalFiles(inputFileName, outputFileName);
+    await downloadRawVideo(inputFileName);
+    await processLocalVideo(inputFileName, outputFileName);
+    await uploadProcessedVideo(outputFileName);
 
+    const processedVideoLocalPath =
+    formatLocalProcessedVideoPath(outputFileName);
+    await generateThumbnailForVideo(
+      processedVideoLocalPath,
+      `thumbnail-${outputFileName}`
+    );
+  } catch (err) {
     return res
-      .status(500)
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .send("Internal Server Error: video processing failed.");
   }
-
-  // Upload the processed video to GCS.
-  await uploadProcessedVideo(outputFileName);
 
   await setVideo(videoId, {
     status: VideoProcessingStatus.COMPLETED,
@@ -75,10 +77,62 @@ app.post("/process", async (req, res) => {
   // Perfom cleanup after uploading the processed video.
   await cleanupLocalFiles(inputFileName, outputFileName);
 
-  return res.status(200).send("Video processed successfully.");
+  return res.status(StatusCodes.OK).send("Video processed successfully.");
 });
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`🚀 Video Processing Service is listening at port :${port}`);
 });
+
+// @TODO: Add static typing for parsed payload.
+/**
+ *
+ * @param {express.Request} req
+ * The express request object.
+ * @return {any}
+ * JSON object parsed from the Pub/Sub message.
+ */
+function getRequestPayload(req: express.Request): VideoMetadata {
+  const message = Buffer
+    .from(req.body, "base64")
+    .toString("utf-8");
+  return JSON.parse(message);
+}
+
+
+/**
+ * Handles the error that occured during video processing.
+ * @param {string} inputFileName
+ * @param {string} outputFileName
+ * @param {unknown} err
+ */
+async function handleVideoProcessingError(
+  inputFileName: string,
+  outputFileName: string,
+  err: unknown
+) {
+  console.error(`Error processing video: ${err}`);
+  /* Clean up local files in case of processing failure.
+  Promise.all allowed as it doesn't matter which file is deleted first. */
+  await cleanupLocalFiles(inputFileName, outputFileName);
+}
+
+/**
+ * Processes the video file.
+ * If an error occurs,
+ * it is caught and handled by {@link handleVideoProcessingError}.
+ * @param {string} inputFileName
+ * @param {string} outputFileName
+ */
+async function processLocalVideo(
+  inputFileName: string,
+  outputFileName: string
+) {
+  try {
+    await processVideo(inputFileName, outputFileName);
+  } catch (err) {
+    await handleVideoProcessingError(inputFileName, outputFileName, err);
+    throw err;
+  }
+}

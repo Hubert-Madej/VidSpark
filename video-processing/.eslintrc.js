@@ -30,4 +30,13 @@ module.exports = {
     "import/no-unresolved": 0,
     "indent": ["error", 2],
   },
+  overrides: [
+    {
+      files: ["src/dto/**/*.ts"],
+      rules: {
+        "new-cap": "off",
+        "require-jsdoc": "off",
+      },
+    },
+  ],
 };

@@ -1,14 +1,14 @@
 import {Storage} from "@google-cloud/storage";
-import ffmpeg from "fluent-ffmpeg";
-import {deleteFile, ensureDirectoryExists} from "./file-system";
+import {deleteFile, ensureDirectoryExists} from "@helpers/file-system";
 import {
   processedVideoBucketName,
   rawVideoBucketName,
-} from "../constants/buckets.constant";
+} from "@constants/buckets.constant";
 import {
   localProcessedVideoPath,
   localRawVideoPath,
-} from "../constants/local-paths.constants";
+  localThumbnailPath,
+} from "@constants/local-paths.constants";
 
 const storage = new Storage();
 
@@ -18,33 +18,7 @@ const storage = new Storage();
 export function setupDirectories() {
   ensureDirectoryExists(localRawVideoPath);
   ensureDirectoryExists(localProcessedVideoPath);
-}
-
-/**
- * @param {string} rawVideoName
- * The name of the file to convert from {@link localRawVideoPath}.
- * @param {string} processedVideoName
- * The name of the file to convert to {@link localProcessedVideoPath}.
- * @return {Promise<void>}
- * A promise that resolves when the video is processed.
- */
-export function processVideo(rawVideoName: string, processedVideoName: string) {
-  return new Promise<void>((resolve, reject) => {
-    ffmpeg()
-      .input(`${localRawVideoPath}/${rawVideoName}`)
-      .outputOption("-vf", "scale=-1:360")
-      .on("end", () => {
-        console.log("Processing finished successfully");
-        resolve();
-      })
-      .on("error", (err) => {
-        console.error(`
-        An error occured during video processing: ${err.message}`
-        );
-        reject(err);
-      })
-      .save(`${localProcessedVideoPath}/${processedVideoName}`);
-  });
+  ensureDirectoryExists(localThumbnailPath);
 }
 
 /**
@@ -109,6 +83,19 @@ export function deleteLocalProcessedVideo(processedVideoName: string) {
  */
 export function deleteLocalRawVideo(rawVideoName: string) {
   return deleteFile(`${localRawVideoPath}/${rawVideoName}`);
+}
+
+/**
+ * Formats the local path for requested processed video file name.
+ * @param {string} processedVideoName
+ * The name of the processed video file.
+ * @return {string}
+ * The local path for the processed video file.
+ */
+export function formatLocalProcessedVideoPath(
+  processedVideoName: string
+): string {
+  return `${localProcessedVideoPath}/${processedVideoName}`;
 }
 
 /**

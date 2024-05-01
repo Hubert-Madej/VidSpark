@@ -1,7 +1,7 @@
 import {credential} from "firebase-admin";
 import {initializeApp} from "firebase-admin/app";
 import {Firestore} from "firebase-admin/firestore";
-import {Video} from "../interfaces/video.interface";
+import {Video} from "@interfaces/video.interface";
 
 initializeApp({credential: credential.applicationDefault()});
 const firestore = new Firestore();
