@@ -3,6 +3,7 @@ import {deleteFile, ensureDirectoryExists} from "@helpers/file-system";
 import {
   processedVideoBucketName,
   rawVideoBucketName,
+  videosThumbnailsBucketName,
 } from "@constants/buckets.constant";
 import {
   localProcessedVideoPath,
@@ -22,6 +23,7 @@ export function setupDirectories() {
 }
 
 /**
+ * Downloads a raw video from the bucket to local storage.
  * @param {string} rawVideoName
  * The name of the raw video file to download.
  * {@link rawVideoBucketName}
@@ -41,10 +43,11 @@ export async function downloadRawVideo(rawVideoName: string) {
 }
 
 /**
+ * Uploads a processed video from local storage to the bucket.
  * @param {string} processedVideoName
- * The name of the processed video file to upload.
+ * The name of the processed video file to upload from the
  * {@link localProcessedVideoPath} folder
- * from the {@link processedVideoBucketName} bucket.
+ * to the {@link processedVideoBucketName} bucket.
  * @return {Promise<void>}
  * A promise that resolves when the video is uploaded.
  */
@@ -64,6 +67,28 @@ export async function uploadProcessedVideo(processedVideoName: string) {
 }
 
 /**
+ * Uploads a thumbnail from local storage to the bucket.
+ * @param {string} thumbnailName
+ * The name of the thumbnail file to upload from the
+ * {@link localThumbnailPath} folder
+ * to the {@link videosThumbnailsBucketName} bucket.
+ */
+export async function uploadThumbnail(thumbnailName: string) {
+  const bucket = storage.bucket(videosThumbnailsBucketName);
+  await bucket.upload(`${localThumbnailPath}/${thumbnailName}`, {
+    destination: thumbnailName,
+  });
+
+  console.log(
+    `File ${thumbnailName} uploaded to 
+    gs://${videosThumbnailsBucketName}/${thumbnailName}`
+  );
+
+  await bucket.file(thumbnailName).makePublic();
+}
+
+/**
+ * Deletes a processed video file from local storage.
  * @param {string} processedVideoName
  * The name of processed video file to delete
  * from the {@link processedVideoBucketName} folder.
@@ -75,6 +100,7 @@ export function deleteLocalProcessedVideo(processedVideoName: string) {
 }
 
 /**
+ * Deletes a raw video file from local storage.
  * @param {string} rawVideoName
  * The name of the raw video file to delete
  * from the {@link localRawVideoPath} folder.
@@ -109,7 +135,7 @@ export function formatLocalProcessedVideoPath(
  * @return {Promise<void>}
  * A promise that resolves when the files have been deleted.
  */
-export function cleanupLocalFiles(
+export function cleanupLocalVideosFiles(
   inputFileName: string,
   outputFileName: string
 ) {
@@ -117,4 +143,15 @@ export function cleanupLocalFiles(
     deleteLocalRawVideo(inputFileName),
     deleteLocalProcessedVideo(outputFileName),
   ]);
+}
+
+/**
+ * Perform cleanup of local thumbnail file.
+ * @param {string} thumbnailFileName
+ * The name of the thumbnail file to delete.
+ * @return {Promise<void>}
+ * A promise that resolves when the file has been deleted.
+ */
+export function cleanupLocalThumbnail(thumbnailFileName: string) {
+  return deleteFile(`${localThumbnailPath}/${thumbnailFileName}`);
 }

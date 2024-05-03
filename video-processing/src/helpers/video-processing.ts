@@ -51,17 +51,21 @@ export function generateThumbnailForVideo(
   return new Promise<void>((resolve, reject) => {
     ffmpeg()
       .input(videoFilePath)
-      .outputOption("-vf", "thumbnail,scale=640:360")
-      .output(`${localThumbnailPath}/${thumbnailName}`)
       .on("end", () => {
         resolve();
       })
       .on("error", (err) => {
-        console.error(`
-        An error occured during thumbnail generation: ${err.message}`
-        );
+        console
+          .error(`
+        An error occurred during thumbnail generation: ${err.message}
+        `);
         reject(err);
       })
-      .run();
+      .screenshots({
+        count: 1,
+        timestamps: ["50%"],
+        filename: thumbnailName,
+        folder: localThumbnailPath,
+      });
   });
 }

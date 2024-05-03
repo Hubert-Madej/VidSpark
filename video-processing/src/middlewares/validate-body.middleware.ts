@@ -1,46 +1,77 @@
 import {ClassConstructor, plainToInstance} from "class-transformer";
-import {validateOrReject} from "class-validator";
+import {validateOrReject, ValidationError} from "class-validator";
 import {NextFunction, Request, Response} from "express";
 import {StatusCodes} from "http-status-codes";
 
 /**
- * Validates and transforms the request body to the target class.
- * @param {T} targetClass
- * The target class to transform the request body to.
+ * Middleware to validate and transform the request body to a target class.
+ * @param {ClassConstructor<T>} targetClass
+ * The target class to transform the request body into.
  * @return {Function}
- * A middleware function for Express.js.
+ * An Express.js middleware function.
  */
-export function validateBody<T>(targetClass: ClassConstructor<T>) {
+export function validateBody<T extends object>(
+  targetClass: ClassConstructor<T>
+) {
   return async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.body.message.data) {
-      res.status(StatusCodes.BAD_REQUEST).send("Invalid request body format.");
+    // Ensure the request body has the expected format
+    const messageData = req.body?.message?.data;
+    if (!messageData) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({error: "Invalid request body format."});
     }
 
-    const instance = plainToInstance(targetClass, req.body.message.data);
-
-    if (typeof instance === "object" && instance !== null) {
-      try {
-        await validateOrReject(instance);
-        req.body = Object.setPrototypeOf(req.body, targetClass.prototype);
-        next();
-      } catch (err) {
-        if (Array.isArray(err) && err.length > 0 && "constraints" in err[0]) {
-          const message = Object.values(err[0].constraints)[0];
-          res
-            .status(StatusCodes.UNPROCESSABLE_ENTITY)
-            .send({message});
-        } else {
-          res
-            .status(StatusCodes.INTERNAL_SERVER_ERROR)
-            .send(
-              "An unknown error occurred during validation of the request body."
-            );
-        }
-      }
-    } else {
-      res
+    // Decode and parse the JSON data
+    let parsedData;
+    try {
+      const decoded = Buffer
+        .from(messageData, "base64")
+        .toString("utf-8");
+      parsedData = JSON.parse(decoded);
+    } catch (error) {
+      return res
         .status(StatusCodes.UNPROCESSABLE_ENTITY)
-        .send("Instance is not an object.");
+        .json({error: "Invalid JSON data."});
+    }
+
+    // Ensure that parsed data is an object
+    if (typeof parsedData !== "object" || parsedData === null) {
+      return res
+        .status(StatusCodes.UNPROCESSABLE_ENTITY)
+        .json({error: "Parsed data is not a valid object."});
+    }
+
+    // Transform to the specified class and validate
+    const instance = plainToInstance(targetClass, parsedData);
+
+    try {
+      await validateOrReject(instance); // Validate the transformed instance
+      req.body = Object
+        .setPrototypeOf(
+          instance,
+          targetClass.prototype
+        ); // Set the prototype
+      return next(); // Proceed to the next middleware
+    } catch (validationErrors) {
+      if (Array.isArray(validationErrors) &&
+         validationErrors[0] instanceof ValidationError
+      ) {
+        const firstError = validationErrors[0];
+        const errorMessage = Object
+          .values(firstError.constraints || {})
+          .join(", ");
+        console.error(`Validation error: ${errorMessage}`);
+        return res
+          .status(StatusCodes.UNPROCESSABLE_ENTITY)
+          .json({error: errorMessage});
+      }
+
+      // Handle unexpected validation errors
+      console.error("Unexpected validation error:", validationErrors);
+      return res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({error: "An internal server error occurred."});
     }
   };
 }

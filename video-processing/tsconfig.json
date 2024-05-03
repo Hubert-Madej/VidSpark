@@ -16,6 +16,7 @@
       "@constants/*": ["./src/constants/*"],
       "@dto/*": ["./src/dto/*"],
       "@middlewares/*": ["./src/middlewares/*"],
+      "@handlers/*": ["./src/handlers/*"],
     }
   },
   "include": ["src/**/*.ts"],

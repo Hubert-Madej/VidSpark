@@ -2,6 +2,7 @@ import {credential} from "firebase-admin";
 import {initializeApp} from "firebase-admin/app";
 import {Firestore} from "firebase-admin/firestore";
 import {Video} from "@interfaces/video.interface";
+import {VideoProcessingStatus} from "@/enums/video-processing-status.enum";
 
 initializeApp({credential: credential.applicationDefault()});
 const firestore = new Firestore();
@@ -48,6 +49,7 @@ export function setVideo(videoId: string, video: Video) {
 export async function isVideoNew(videoId: string) {
   const video = await getVideo(videoId);
   // If we didn't set the status yet, it indicates that the video is new.
-  return video?.status === undefined;
+  return video?.status === undefined ||
+   video?.status === VideoProcessingStatus.PENDING;
 }
 
