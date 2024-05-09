@@ -1,0 +1,46 @@
+.Fieldset {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.Label {
+  font-size: 15px;
+  color: var(--cyan-11);
+  width: 90px;
+}
+
+.Input {
+  width: 100%;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 0 10px;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--cyan-11);
+  box-shadow: 0 0 0 1px var(--cyan-7);
+  height: 35px;
+}
+.Input:focus {
+  box-shadow: 0 0 0 2px var(--cyan-8);
+}
+
+.TextArea {
+  width: 100%;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding-top: 10px;
+  padding-left: 10px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--cyan-11);
+  box-shadow: 0 0 0 1px var(--cyan-7);
+  height: auto;
+}

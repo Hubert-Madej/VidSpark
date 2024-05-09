@@ -1,9 +1,10 @@
 import Toaster from '@/app/components/toaster/toast';
 import { AuthProps } from '@/app/interfaces/auth-user.interface';
 import { uploadVideo } from '@/app/utilities/firebase/functions';
-import { Button, Dialog, Flex, Text } from '@radix-ui/themes';
+import { Button, Dialog, Flex, Text, TextArea } from '@radix-ui/themes';
 import * as React from 'react';
 import { FaUpload } from 'react-icons/fa';
+import styles from './upload-dialog.module.css';
 
 const UploadDialog = ({ user }: AuthProps) => {
   const [toastOpen, setToastOpen] = React.useState(false);
@@ -51,6 +52,20 @@ const UploadDialog = ({ user }: AuthProps) => {
               Show the world another piece of your history!
             </Dialog.Description>
 
+            <fieldset className={styles.Fieldset}>
+              <label className={styles.Label} htmlFor="title">
+                Title
+              </label>
+              <input className={styles.Input} id="title" />
+            </fieldset>
+
+            <fieldset className={styles.Fieldset}>
+              <label className={styles.Label} htmlFor="description">
+                Description
+              </label>
+              <textarea className={styles.TextArea} rows={8} id="description" />
+            </fieldset>
+
             <Flex gapY="2" direction="column" gap="3">
               <Text as="div" size="4" mb="1" weight="bold">
                 File to upload:
@@ -64,11 +79,9 @@ const UploadDialog = ({ user }: AuthProps) => {
                   Cancel
                 </Button>
               </Dialog.Close>
-              <Dialog.Close>
-                <Button onClick={handleUpload} color="cyan" variant="soft">
-                  Upload
-                </Button>
-              </Dialog.Close>
+              <Button onClick={handleUpload} color="cyan" variant="soft">
+                Upload
+              </Button>
             </Flex>
           </Dialog.Content>
         </Dialog.Root>

@@ -33,3 +33,34 @@
 .header-pre:hover {
   background-color: #b9fff9;
 }
+
+.hamburger {
+  display: block;
+}
+
+.menu {
+  display: none;
+}
+
+.menu.open {
+  display: block;
+}
+
+.desktopMenu {
+  display: none;
+}
+
+/* Hide hamburger menu and show regular menu on screens larger than 768px */
+@media (min-width: 768px) {
+  .hamburger {
+    display: none;
+  }
+
+  .menu {
+    display: none;
+  }
+
+  .desktopMenu {
+    display: flex;
+  }
+}

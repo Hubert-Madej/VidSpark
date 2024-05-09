@@ -7,8 +7,13 @@ import { getVideos } from './utilities/firebase/functions';
 
 export default async function Home() {
   const videos: Video[] = await getVideos();
-  const videoThumbnailPrefix =
-    'https://storage.googleapis.com/vidspark-videos-thumbnails/';
+  const videoThumbnailPrefix = process.env.VIDEOS_THUMBNAILS_BUCKET_URL;
+
+  if (!videoThumbnailPrefix) {
+    throw new Error(
+      'The VIDEOS_THUMBNAILS_BUCKET_URL environment variable is not set.',
+    );
+  }
 
   return (
     <main className={styles.main}>
