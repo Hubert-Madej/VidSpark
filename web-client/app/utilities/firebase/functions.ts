@@ -1,12 +1,14 @@
-import { GenerateUploadUrlResponse } from "@/app/interfaces/generate-upload-url-response.interface";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { get } from "http";
-import { functions } from "./firebase";
-import { Video } from "@/app/interfaces/video.interface";
+import { get } from 'http';
+
+import { GenerateUploadUrlResponse } from '@/app/interfaces/generate-upload-url-response.interface';
+import { Video } from '@/app/interfaces/video.interface';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+
+import { functions } from './firebase';
 
 // Initialize the Firebase Functions client.
-const generateUploadUrl = httpsCallable(functions, "generateUploadUrl");
-const getVideosFunction = httpsCallable(functions, "getVideos");
+const generateUploadUrl = httpsCallable(functions, 'generateUploadUrl');
+const getVideosFunction = httpsCallable(functions, 'getVideos');
 
 /**
  * Uploads a video file to the bucket via signed URL.
@@ -15,15 +17,15 @@ const getVideosFunction = httpsCallable(functions, "getVideos");
  */
 export async function uploadVideo(file: File) {
   const response = (await generateUploadUrl({
-    fileExtension: file.name.split(".").pop(),
+    fileExtension: file.name.split('.').pop(),
   })) as GenerateUploadUrlResponse;
 
   await fetch(response.data.url, {
-    method: "PUT",
+    method: 'PUT',
     body: file,
     headers: {
       'Content-Type': file.type,
-    }
+    },
   });
 
   return;

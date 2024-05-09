@@ -7,15 +7,15 @@ import {
   onAuthStateChanged,
   User,
 } from 'firebase/auth';
+import { getFunctions } from 'firebase/functions';
 
 import { firebaseConfig } from '../config/firebase.config';
-import { getFunctions } from 'firebase/functions';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
-export const functions = getFunctions()
+export const functions = getFunctions();
 /**
  * Signs the user in with a Google popup.
  * @returns A Prommise that resolves with the user's data.

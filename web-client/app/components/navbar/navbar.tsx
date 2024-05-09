@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import styles from './navbar.module.css';
 import Auth from '../auth/auth';
 import UploadDialog from '../upload-dialog/upload-dialog';
-import Image from 'next/image';
+import UserInfo from '../user-info/user-info';
 
 export default function Navbar() {
   // Initialize the user state.
@@ -33,9 +33,7 @@ export default function Navbar() {
         <Flex align="center" gap="3">
           <UploadDialog user={user} />
           <Auth user={user} />
-          {user && (
-            <Image className={styles.avatar} src={user.photoURL!} alt='User Profile Image' width={32} height={32}></Image>
-          )}
+          <UserInfo user={user} />
         </Flex>
       </Flex>
     </nav>

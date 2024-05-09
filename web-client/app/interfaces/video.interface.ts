@@ -1,4 +1,4 @@
-import { VideoProcessingStatus } from "../enums/video-processing-status.enum";
+import { VideoProcessingStatus } from '../enums/video-processing-status.enum';
 
 export interface Video {
   id: string;

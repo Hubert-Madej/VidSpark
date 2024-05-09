@@ -1,11 +1,11 @@
+import Toaster from '@/app/components/toaster/toast';
 import { AuthProps } from '@/app/interfaces/auth-user.interface';
 import { uploadVideo } from '@/app/utilities/firebase/functions';
-import Toaster from '@/app/components/toaster/toast';
 import { Button, Dialog, Flex, Text } from '@radix-ui/themes';
 import * as React from 'react';
 import { FaUpload } from 'react-icons/fa';
 
-const UploadDialog = ({user}: AuthProps) => {
+const UploadDialog = ({ user }: AuthProps) => {
   const [toastOpen, setToastOpen] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
@@ -35,28 +35,29 @@ const UploadDialog = ({user}: AuthProps) => {
   };
 
   return (
-      user && <>
-       <Dialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
+    user && (
+      <>
+        <Dialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
           <Dialog.Trigger>
             <Button size="3" color="cyan" variant="soft">
               <FaUpload />
               Upload
             </Button>
           </Dialog.Trigger>
-  
+
           <Dialog.Content maxWidth="450px">
             <Dialog.Title>Upload your new video</Dialog.Title>
             <Dialog.Description size="2" mb="4">
               Show the world another piece of your history!
             </Dialog.Description>
-  
-            <Flex gapY='2' direction="column" gap="3">
+
+            <Flex gapY="2" direction="column" gap="3">
               <Text as="div" size="4" mb="1" weight="bold">
                 File to upload:
               </Text>
               <input onChange={handleFileChange} type="file" accept="video/*" />
             </Flex>
-  
+
             <Flex gap="3" mt="4" justify="end">
               <Dialog.Close>
                 <Button variant="soft" color="gray">
@@ -73,6 +74,7 @@ const UploadDialog = ({user}: AuthProps) => {
         </Dialog.Root>
         <Toaster open={toastOpen} setOpen={setToastOpen} text={toastMessage} />
       </>
+    )
   );
 };
 

@@ -1,5 +1,5 @@
-import * as React from 'react';
 import * as Toast from '@radix-ui/react-toast';
+import * as React from 'react';
 import './toast.css';
 
 interface ToasterProps {
@@ -11,7 +11,13 @@ interface ToasterProps {
 }
 
 // @TODO: Add different toast types, depending on function call outcome (success, error, warning, etc.).
-const Toaster: React.FC<ToasterProps> = ({ open, setOpen, children, text, duration = 5000 }) => {
+const Toaster: React.FC<ToasterProps> = ({
+  open,
+  setOpen,
+  children,
+  text,
+  duration = 5000,
+}) => {
   React.useEffect(() => {
     let timer: NodeJS.Timeout;
     if (open) {
