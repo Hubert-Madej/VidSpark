@@ -19,6 +19,7 @@ if [ $? -eq 0 ]; then
     echo "Docker image upload was successful."
 else
     echo "Docker image upload failed."
+    exit 1
 fi
 
 gcloud run deploy vs-video-processing-service --image us-central1-docker.pkg.dev/$GCP_PROJECT_ID/video-processing-repo/video-processing-service \

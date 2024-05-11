@@ -30,6 +30,9 @@ jobs:
       env:
         GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
 
+    - name: List Docker images
+      run: docker images
+
     - name: Run deployment script
       run: bash scripts/deploy-video-processing-service.sh
       env:
