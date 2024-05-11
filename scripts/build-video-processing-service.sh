@@ -8,4 +8,4 @@ fi
 
 # Build the video-processing Docker image.
 # --platform linux/amd64 flag is used to build the image for the x86 architecture.
-docker build --platform linux/amd64 -t gcr.io/$GCP_PROJECT_ID/video-processing -f video-processing/Dockerfile .
+docker build -t us-central1-docker.pkg.dev/$GCP_PROJECT_ID/video-processing-repo/video-processing-service -f video-processing/Dockerfile .
