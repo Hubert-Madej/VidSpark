@@ -5,12 +5,12 @@ import { Flex } from '@radix-ui/themes';
 import { User } from 'firebase/auth';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { RxHamburgerMenu } from 'react-icons/rx';
 
 import styles from './navbar.module.css';
 import Auth from '../auth/auth';
 import UploadDialog from '../upload-dialog/upload-dialog';
 import UserInfo from '../user-info/user-info';
-import { RxHamburgerMenu } from 'react-icons/rx';
 
 export default function Navbar() {
   // Initialize the user state.

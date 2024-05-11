@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 import {isVideoNew, setVideo} from "@helpers/firestore";
-import {VideoProcessingStatus} from "@enums/video-processing-status.enum";
+import {VideoProcessingStatus} from "common";
 import {
   generateThumbnailForVideo,
   processVideo,

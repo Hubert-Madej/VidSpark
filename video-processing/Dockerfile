@@ -1,38 +1,45 @@
-# Stage 1: Build the app
-FROM node:20-slim AS builder
+# Stage 1: Build environment
+FROM node:20 as builder
 
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json into the working directory
-COPY package*.json ./
+# Copy the common and video-processing directories
+COPY common ./common
+COPY video-processing ./video-processing
 
-# Install any needed packages specified in package.json
+# Install dependencies and build the common module
+WORKDIR /app/common
 RUN npm install
+RUN npm run build
 
-# Bundle app source inside the docker image
-COPY . .
-
-# Build the app
+# Install dependencies, create a symbolic link to the common module, and build the video-processing module
+WORKDIR /app/video-processing
+RUN npm install
+RUN ln -s /app/common ./node_modules/common
 RUN npm run build
 
 # Stage 2: Production environment
 FROM node:20-slim
 
 # Install ffmpeg
-RUN apt-get update && apt-get install -y ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg build-essential
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the package.json file
-COPY package*.json ./
+# Copy the common module and its dependencies
+COPY --from=builder /app/common /app/common
 
-# Install only the production dependencies
+# Copy the video-processing module and its dependencies
+COPY --from=builder /app/video-processing /app/video-processing
+
+# Install only the production dependencies for each module
+WORKDIR /app/common
 RUN npm install --only=production
 
-# Copy the source code
-COPY --from=builder /app/dist ./dist
+WORKDIR /app/video-processing
+RUN npm install --only=production
 
 # Expose the port outside the container
 EXPOSE 3000

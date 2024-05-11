@@ -1,8 +1,7 @@
+import {Video, VideoProcessingStatus} from "common";
 import {credential} from "firebase-admin";
 import {initializeApp} from "firebase-admin/app";
 import {Firestore} from "firebase-admin/firestore";
-import {Video} from "@interfaces/video.interface";
-import {VideoProcessingStatus} from "@/enums/video-processing-status.enum";
 
 initializeApp({credential: credential.applicationDefault()});
 const firestore = new Firestore();

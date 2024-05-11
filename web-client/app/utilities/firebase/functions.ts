@@ -1,7 +1,7 @@
 import { get } from 'http';
 
 import { GenerateUploadUrlResponse } from '@/app/interfaces/generate-upload-url-response.interface';
-import { Video } from '@/app/interfaces/video.interface';
+import { Video } from 'common';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 
 import { functions } from './firebase';

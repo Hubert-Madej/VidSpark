@@ -1,9 +1,5 @@
-import {VideoProcessingStatus} from "@enums/video-processing-status.enum";
+import { VideoProcessingStatus } from "../enums/video-processing-status.enum";
 
-// TODO: Add interface sharing across services.
-/**
- * Data Source model for Video Metadata.
- */
 export interface Video {
   id?: string;
   uid?: string;

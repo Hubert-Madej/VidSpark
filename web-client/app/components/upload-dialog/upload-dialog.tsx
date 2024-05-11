@@ -1,10 +1,9 @@
 import Toaster from '@/app/components/toaster/toast';
 import { AuthProps } from '@/app/interfaces/auth-user.interface';
 import { uploadVideo } from '@/app/utilities/firebase/functions';
-import { Button, Dialog, Flex, Text, TextArea } from '@radix-ui/themes';
+import { Badge, Button, Dialog, Flex, Text } from '@radix-ui/themes';
 import * as React from 'react';
 import { FaUpload } from 'react-icons/fa';
-import styles from './upload-dialog.module.css';
 
 const UploadDialog = ({ user }: AuthProps) => {
   const [toastOpen, setToastOpen] = React.useState(false);
@@ -49,22 +48,10 @@ const UploadDialog = ({ user }: AuthProps) => {
           <Dialog.Content maxWidth="450px">
             <Dialog.Title>Upload your new video</Dialog.Title>
             <Dialog.Description size="2" mb="4">
-              Show the world another piece of your history!
+              After processing you video it will be in{' '}
+              <Badge color="orange">Draft</Badge> state. You can add all the
+              details in &quot;Studio&quot; tab and publish it later.
             </Dialog.Description>
-
-            <fieldset className={styles.Fieldset}>
-              <label className={styles.Label} htmlFor="title">
-                Title
-              </label>
-              <input className={styles.Input} id="title" />
-            </fieldset>
-
-            <fieldset className={styles.Fieldset}>
-              <label className={styles.Label} htmlFor="description">
-                Description
-              </label>
-              <textarea className={styles.TextArea} rows={8} id="description" />
-            </fieldset>
 
             <Flex gapY="2" direction="column" gap="3">
               <Text as="div" size="4" mb="1" weight="bold">

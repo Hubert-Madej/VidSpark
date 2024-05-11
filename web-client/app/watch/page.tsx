@@ -1,11 +1,12 @@
 'use client';
 import { Button, Flex } from '@radix-ui/themes';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import styles from './watch.module.css';
+import { useState } from 'react';
 import { AiOutlineLike } from 'react-icons/ai';
 import { AiOutlineDislike } from 'react-icons/ai';
-import Image from 'next/image';
-import { useState } from 'react';
+
+import styles from './watch.module.css';
 
 export default function Watch() {
   const videoSrc = useSearchParams().get('v');

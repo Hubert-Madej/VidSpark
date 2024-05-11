@@ -1,7 +1,7 @@
+import { Video } from 'common';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Video } from './interfaces/video.interface';
 import styles from './page.module.css';
 import { getVideos } from './utilities/firebase/functions';
 

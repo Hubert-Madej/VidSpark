@@ -1,0 +1,5 @@
+{
+  "name": "fullstack-youtube",
+  "private": true,
+  "workspaces": ["common"]
+}

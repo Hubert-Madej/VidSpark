@@ -1,6 +1,7 @@
 import { AuthProps } from '@/app/interfaces/auth-user.interface';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import Image from 'next/image';
+
 import styles from './user-info.module.css';
 
 export default function UserInfo({ user }: AuthProps) {

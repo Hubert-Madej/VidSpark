@@ -1,0 +1,10 @@
+{
+  "name": "common",
+  "private": true,
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
