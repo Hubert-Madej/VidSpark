@@ -25,6 +25,12 @@ jobs:
     - name: Authenticate Docker with Google Cloud
       run: gcloud auth configure-docker
 
+    - name: Authenticate Docker client
+      run: gcloud auth configure-docker us-central1-docker.pkg.dev
+      env:
+        GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
     - name: Run build script
       run: bash scripts/build-video-processing-service.sh
       env:
