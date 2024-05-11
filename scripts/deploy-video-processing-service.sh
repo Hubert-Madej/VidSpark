@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# Authenticate with Google Cloud
-gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+if [ -z "${GCP_PROJECT_ID}" ]; then
+    echo "GCP_PROJECT_ID is not set. Exiting."
+    exit 1
+fi
 
 # Set the project ID
 gcloud config set project $GCP_PROJECT_ID
@@ -18,3 +20,14 @@ if [ $? -eq 0 ]; then
 else
     echo "Docker image upload failed."
 fi
+
+gcloud run deploy vs-video-processing-service --image us-central1-docker.pkg.dev/$GCP_PROJECT_ID/video-processing-repo/video-processing-service \
+  --region=us-central1 \
+  --platform managed \
+  --timeout=3600 \
+  --memory=2Gi \
+  --cpu=1 \
+  --min-instances=0 \
+  --max-instances=1 \
+  --ingress=internal \
+  --port 3000

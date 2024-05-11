@@ -1,13 +1,9 @@
 #!/bin/bash
 
-# Go to root directory.
-cd ../
-
 # Check if GCP_PROJECT_ID is set. Prompt user for input if not set.
 if [ -z "$GCP_PROJECT_ID" ]; then
-  echo "GCP_PROJECT_ID is not set. Please enter your GCP project ID:"
-  read GCP_PROJECT_ID
-  export GCP_PROJECT_ID
+  echo "GCP_PROJECT_ID is not set. Exiting."
+  exit 1
 fi
 
 # Build the video-processing Docker image.
