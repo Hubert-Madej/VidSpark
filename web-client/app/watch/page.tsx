@@ -1,17 +1,20 @@
 'use client';
 import { Button, Flex } from '@radix-ui/themes';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { redirect, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { AiOutlineLike } from 'react-icons/ai';
 import { AiOutlineDislike } from 'react-icons/ai';
 
 import styles from './watch.module.css';
+import { Video } from 'common';
+import { getVideoMetadata } from '../utilities/firebase/functions';
 
 export default function Watch() {
   const videoSrc = useSearchParams().get('v');
   const videoPrefix = process.env.VIDEOS_BUCKET_URL;
   const [isExpanded, setIsExpanded] = useState(false);
+  const [videoMetadata, setVideoMetadata] = useState({} as Video);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -21,11 +24,24 @@ export default function Watch() {
     throw new Error('The VIDEOS_BUCKET_URL environment variable is not set.');
   }
 
+  if (!videoSrc) {
+    redirect('/');
+  }
+
+  useEffect(() => {
+    const idStartIndex = videoSrc.indexOf('-') + 1;
+    const idEndIndex = videoSrc.lastIndexOf('.mp4');
+    const videoId = videoSrc.substring(idStartIndex, idEndIndex);
+    getVideoMetadata(videoId).then((video) => {
+      setVideoMetadata(video);
+    });
+  }, [])
+
   return (
     <Flex
       direction="column"
       gap="8"
-      className={styles.VideoContainer}
+      className="mx-auto w-3/4 xl:w-1/2"
       align="center"
       justify="center"
     >
@@ -37,8 +53,8 @@ export default function Watch() {
 
       <div className={styles.MetaData}>
         <div className="flex flex-col gap-4 text-2xl font-extrabold">
-          <h1>Chillstep Music for Programming / Cyber / Coding</h1>
-          <div className="flex flex-row justify-between font-normal text-base">
+          <h1>{videoMetadata.title}</h1>
+          <div className="flex flex-col gap-4 md:flex-row justify-between font-normal text-base">
             <div className="flex flex-row gap-2">
               <Image
                 className="w-12 h-12 rounded-full"
@@ -76,64 +92,10 @@ export default function Watch() {
             className={`flex ${isExpanded ? 'items-left flex-col' : 'flex-row items-end'}`}
           >
             <p className={`${isExpanded ? '' : styles.Collapsed}`}>
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-              Cupiditate sapiente atque, neque commodi fuga ut nisi maiores
-              totam porro omnis iste excepturi laudantium praesentium modi
-              facere. Voluptatum molestias assumenda alias? Lorem ipsum dolor,
-              sit amet consectetur adipisicing elit. Cupiditate sapiente atque,
-              neque commodi fuga ut nisi maiores totam porro omnis iste
-              excepturi laudantium praesentium modi facere. Voluptatum molestias
-              assumenda alias? Lorem ipsum dolor, sit amet consectetur
-              adipisicing elit. Cupiditate sapiente atque, neque commodi fuga ut
-              nisi maiores totam porro omnis iste excepturi laudantium
-              praesentium modi facere. Voluptatum molestias assumenda alias?
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-              Cupiditate sapiente atque, neque commodi fuga ut nisi maiores
-              totam porro omnis iste excepturi laudantium praesentium modi
-              facere. Voluptatum molestias assumenda alias? Lorem ipsum dolor,
-              sit amet consectetur adipisicing elit. Cupiditate sapiente atque,
-              neque commodi fuga ut nisi maiores totam porro omnis iste
-              excepturi laudantium praesentium modi facere. Voluptatum molestias
-              assumenda alias? Lorem ipsum dolor, sit amet consectetur
-              adipisicing elit. Cupiditate sapiente atque, neque commodi fuga ut
-              nisi maiores totam porro omnis iste excepturi laudantium
-              praesentium modi facere. Voluptatum molestias assumenda alias?
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-              Cupiditate sapiente atque, neque commodi fuga ut nisi maiores
-              totam porro omnis iste excepturi laudantium praesentium modi
-              facere. Voluptatum molestias assumenda alias? Lorem ipsum dolor,
-              sit amet consectetur adipisicing elit. Cupiditate sapiente atque,
-              neque commodi fuga ut nisi maiores totam porro omnis iste
-              excepturi laudantium praesentium modi facere. Voluptatum molestias
-              assumenda alias? Lorem ipsum dolor, sit amet consectetur
-              adipisicing elit. Cupiditate sapiente atque, neque commodi fuga ut
-              nisi maiores totam porro omnis iste excepturi laudantium
-              praesentium modi facere. Voluptatum molestias assumenda alias?
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-              Cupiditate sapiente atque, neque commodi fuga ut nisi maiores
-              totam porro omnis iste excepturi laudantium praesentium modi
-              facere. Voluptatum molestias assumenda alias? Lorem ipsum dolor,
-              sit amet consectetur adipisicing elit. Cupiditate sapiente atque,
-              neque commodi fuga ut nisi maiores totam porro omnis iste
-              excepturi laudantium praesentium modi facere. Voluptatum molestias
-              assumenda alias? Lorem ipsum dolor, sit amet consectetur
-              adipisicing elit. Cupiditate sapiente atque, neque commodi fuga ut
-              nisi maiores totam porro omnis iste excepturi laudantium
-              praesentium modi facere. Voluptatum molestias assumenda alias?
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-              Cupiditate sapiente atque, neque commodi fuga ut nisi maiores
-              totam porro omnis iste excepturi laudantium praesentium modi
-              facere. Voluptatum molestias assumenda alias? Lorem ipsum dolor,
-              sit amet consectetur adipisicing elit. Cupiditate sapiente atque,
-              neque commodi fuga ut nisi maiores totam porro omnis iste
-              excepturi laudantium praesentium modi facere. Voluptatum molestias
-              assumenda alias? Lorem ipsum dolor, sit amet consectetur
-              adipisicing elit. Cupiditate sapiente atque, neque commodi fuga ut
-              nisi maiores totam porro omnis iste excepturi laudantium
-              praesentium modi facere. Voluptatum molestias assumenda alias?
+              {videoMetadata.description}
             </p>
             <button
-              className="font-bold ml-0 text-left mt-2"
+              className="font-bold ml-0 text-left text-xs mt-2"
               onClick={toggleExpand}
             >
               {isExpanded ? 'Show less' : 'Show More'}

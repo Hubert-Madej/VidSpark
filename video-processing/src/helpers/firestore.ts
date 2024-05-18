@@ -33,7 +33,7 @@ async function getVideo(videoId: string) {
  * @return {Promise<FirebaseFirestore.WriteResult>}
  * A promise that resolves with the write result of the update operation.
  */
-export function setVideo(videoId: string, video: Video) {
+export function setVideo(videoId: string, video: Partial<Video>) {
   return firestore
     .collection(videoCollectionId)
     .doc(videoId)
@@ -48,7 +48,7 @@ export function setVideo(videoId: string, video: Video) {
 export async function isVideoNew(videoId: string) {
   const video = await getVideo(videoId);
   // If we didn't set the status yet, it indicates that the video is new.
-  return video?.status === undefined ||
-   video?.status === VideoProcessingStatus.PENDING;
+  return video?.processingStatus === undefined ||
+   video?.processingStatus === VideoProcessingStatus.PENDING;
 }
 

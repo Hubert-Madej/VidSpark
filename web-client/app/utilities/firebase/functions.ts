@@ -9,6 +9,7 @@ import { functions } from './firebase';
 // Initialize the Firebase Functions client.
 const generateUploadUrl = httpsCallable(functions, 'generateUploadUrl');
 const getVideosFunction = httpsCallable(functions, 'getVideos');
+const getVideoMetadataFunction = httpsCallable(functions, 'getVideoMetadata');
 
 /**
  * Uploads a video file to the bucket via signed URL.
@@ -34,4 +35,9 @@ export async function uploadVideo(file: File) {
 export async function getVideos() {
   const response = await getVideosFunction();
   return response.data as Video[];
+}
+
+export async function getVideoMetadata(videoId: string) {
+  const response = await getVideoMetadataFunction({ videoId });
+  return response.data as Video;
 }

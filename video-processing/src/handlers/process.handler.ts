@@ -47,7 +47,9 @@ export default async function handleProcessingRoute(
     await setVideo(videoId, {
       id: videoId,
       uid: videoId.split("-")[0],
-      status: VideoProcessingStatus.PROCESSING,
+      processingStatus: VideoProcessingStatus.PROCESSING,
+      title: 'movie'
+
     });
   }
 
@@ -59,7 +61,7 @@ export default async function handleProcessingRoute(
   } catch (err) {
     console.error(`Error processing video: ${err}`);
     await setVideo(videoId, {
-      status: VideoProcessingStatus.PENDING,
+      processingStatus: VideoProcessingStatus.PENDING,
     });
 
     return res
@@ -82,7 +84,7 @@ export default async function handleProcessingRoute(
   }
 
   await setVideo(videoId, {
-    status: VideoProcessingStatus.COMPLETED,
+    processingStatus: VideoProcessingStatus.COMPLETED,
     videoFileName: outputFileName,
     thumbnailFileName: thumbnailFileName,
   });
